@@ -3,7 +3,7 @@ Zabbix-proxy
 
 Requerimentos
 ------------
-- Nenhum
+- ansible 2.9.6
 - Suporte as distribuições baseadas em Debian e RedHat
 - Testado no Ubuntu20 e Rocky8 
 - Banco de dados Sqlite
