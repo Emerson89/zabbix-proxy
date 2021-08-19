@@ -1,0 +1,67 @@
+---
+- name: Set some fact
+  set_fact:
+    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+
+- name: Disable SELinux
+  selinux:
+      state: disabled
+
+- name: Install Zabbix Repo.
+  yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    gpgcheck: "{{ item.gpgcheck }}"
+    gpgkey: "{{ item.gpgkey }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ zabbix_repo_yum }}"
+
+- name: Install Zabbix packeges
+  yum:
+    name: "{{ packeges }}"
+  vars:
+    packeges:
+    - zabbix-proxy-sqlite3
+    - zabbix-agent
+
+- name: Create a directory if it does not exist
+  file:
+    path: /var/lib/sqlite/
+    state: directory
+    mode: '0755'
+
+- name: Import database Zabbix-proxy
+  shell: |
+   gzip /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz
+   sqlite3 /var/lib/sqlite/zabbix.db < /usr/share/doc/zabbix-proxy-sqlite3/schema.sql
+   chown -R zabbix:zabbix /var/lib/sqlite/
+  ignore_errors: true
+
+- name: Make sure zabbix-agent service is running
+  systemd:
+    name: zabbix-agent
+    state: started
+    enabled: yes
+
+- name: Make sure zabbix-proxy service is running
+  systemd:
+    name: zabbix-proxy
+    state: started
+    enabled: yes
+
+- name: Copy zabbix_proxy.conf template 
+  template:
+    src: zabbix_proxy.conf.j2
+    dest: /etc/zabbix/zabbix_proxy.conf
+
+- name: restart zabbix-proxy
+  service:
+    name: zabbix-proxy
+    state: restarted
+
+- name: Copy zabbix_agent.conf template 
+  template:
+    src: zabbix_agentd.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.conf
+  notify: start zabbix agent
