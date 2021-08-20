@@ -41,12 +41,6 @@
     state: started
     enabled: yes
 
-- name: Make sure zabbix-proxy service is running
-  systemd:
-    name: zabbix-proxy
-    state: started
-    enabled: yes
-
 - name: Copy zabbix_proxy.conf template 
   template:
     src: zabbix_proxy.conf.j2
