@@ -1,3 +1,6 @@
 ---
-- name: Including tasks for {{ ansible_distribution }} {{ ansible_distribution_major_version }}
-  include_tasks: "{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml"
+- include_tasks: RedHat.yml
+  when: ansible_distribution_file_variety == 'RedHat'
+
+- include_tasks: Debian.yml
+  when: ansible_distribution_file_variety == 'Debian'

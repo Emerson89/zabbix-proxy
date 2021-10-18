@@ -3,19 +3,22 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
 
-- name: Add an Apt signing key zabbix
-  ansible.builtin.apt_key:
-    url: http://repo.zabbix.com/zabbix-official-repo.key
-    state: present
+- name: Disable SELinux
+  selinux:
+      state: disabled
 
-- name: Install repo zabbix
-  ansible.builtin.apt_repository:
-    repo: "{{ repo_zabbix }}"
-    state: present
-    update_cache: true
+- name: Install Zabbix Repo.
+  yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    gpgcheck: "{{ item.gpgcheck }}"
+    gpgkey: "{{ item.gpgkey }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ zabbix_repo_yum }}"
 
 - name: Install Zabbix packeges
-  apt:
+  yum:
     name: "{{ packeges }}"
   vars:
     packeges:
@@ -30,20 +33,13 @@
 
 - name: Import database Zabbix-proxy
   shell: |
-   gzip /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz
-   sqlite3 /var/lib/sqlite/zabbix.db < /usr/share/doc/zabbix-proxy-sqlite3/schema.sql
+   zcat /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz | sqlite3 /var/lib/sqlite/zabbix.db
    chown -R zabbix:zabbix /var/lib/sqlite/
   ignore_errors: true
 
 - name: Make sure zabbix-agent service is running
   systemd:
     name: zabbix-agent
-    state: started
-    enabled: yes
-
-- name: Make sure zabbix-proxy service is running
-  systemd:
-    name: zabbix-proxy
     state: started
     enabled: yes
 
