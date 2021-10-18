@@ -46,7 +46,7 @@ Playbook Exemplo
 ---
 - hosts: all
   vars:
-    zabbix_server_ip: '192.168.33.11'
+    zabbix_server_ip: 'IP-ZABBIX-SERVER'
     zabbix_version: 5.0
   roles:
     - zabbix
