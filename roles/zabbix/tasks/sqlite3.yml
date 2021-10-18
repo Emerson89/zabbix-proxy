@@ -1,0 +1,29 @@
+- name: "Sqlite3 | Default Database Path"
+  set_fact:
+    zabbix_proxy_dbname: /var/lib/zabbix/zabbix_proxy.db
+  when:
+    - zabbix_proxy_dbname == "zabbix_proxy"
+
+- name: Create a directory if it does not exist
+  file:
+    path: "{{ zabbix_proxy_dbname | dirname }}"
+    owner: zabbix
+    group: zabbix
+    state: directory
+    mode: '0755'
+  when:
+    - zabbix_database_creation
+    
+- name: Import database Zabbix-proxy
+  shell: |
+   zcat /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz | sqlite3 {{ zabbix_proxy_dbname }}
+   chown -R zabbix:zabbix /var/lib/zabbix/zabbix_proxy.db
+  #ignore_errors: true
+  when:
+    - zabbix_database_creation
+
+- name: Inserindo DBName
+  lineinfile:
+    path: /etc/zabbix/zabbix_proxy.conf
+    regexp: '^DBName=zabbix_proxy'
+    line: 'DBName=/var/lib/zabbix/zabbix_proxy.db'

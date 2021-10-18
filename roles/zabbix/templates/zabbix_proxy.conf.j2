@@ -170,7 +170,7 @@ DBHost=localhost
 # Default:
 # DBName=
 
-DBName=/var/lib/sqlite/zabbix.db
+DBName={{ zabbix_proxy_dbname }}
 
 ### Option: DBSchema
 #	Schema name. Used for IBM DB2 and PostgreSQL.
@@ -183,7 +183,7 @@ DBName=/var/lib/sqlite/zabbix.db
 #	Database user. Ignored for SQLite.
 #
 # Default:
-# DBUser=
+DBUser={{ zbx_database_user }}
 
 ### Option: DBPassword
 #	Database password. Ignored for SQLite.
@@ -191,7 +191,7 @@ DBName=/var/lib/sqlite/zabbix.db
 #
 # Mandatory: no
 # Default:
-#DBPassword=
+DBPassword={{ zbx_database_password }}
 
 ### Option: DBSocket
 #	Path to MySQL socket.

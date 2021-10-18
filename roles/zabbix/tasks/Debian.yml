@@ -3,6 +3,18 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
 
+- name: "Debian | Set facts for Zabbix >= 3.0"
+  set_fact:
+    datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}"
+  when:
+    - zabbix_version is version_compare('3.0', '>=')
+
+- name: "Debian | Set facts for Zabbix >= 5.4"
+  set_fact:
+    datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_database }}"
+  when:
+    - zabbix_version is version_compare('5.4', '>=')
+
 - name: Add an Apt signing key zabbix
   ansible.builtin.apt_key:
     url: http://repo.zabbix.com/zabbix-official-repo.key
@@ -10,29 +22,48 @@
 
 - name: Install repo zabbix
   ansible.builtin.apt_repository:
-    repo: "{{ repo_zabbix }}"
+    repo: "{{ item }} https://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu {{ ansible_distribution_release }} main"
     state: present
-    update_cache: true
+  when: zabbix_repo == "zabbix"
+  with_items:
+    - deb-src
+    - deb
 
 - name: Install Zabbix packeges
   apt:
     name: "{{ packeges }}"
   vars:
     packeges:
-    - zabbix-proxy-sqlite3
+    - zabbix-proxy-{{ zabbix_proxy_database }}
     - zabbix-agent
+  when: zabbix_version <= 5.0
 
-- name: Create a directory if it does not exist
-  file:
-    path: /var/lib/sqlite/
-    state: directory
-    mode: '0755'
+- name: Install Zabbix packeges
+  apt:
+    name: "{{ packeges }}"
+  vars:
+    packeges:
+    - zabbix-sql-scripts
+    - zabbix-proxy-{{ zabbix_proxy_database }}
+    - zabbix-agent
+  when: zabbix_version >= 5.4
 
-- name: Import database Zabbix-proxy
-  shell: |
-   zcat /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz | sqlite3 /var/lib/sqlite/zabbix.db
-   chown -R zabbix:zabbix /var/lib/sqlite/
-  ignore_errors: true
+- name: "Debian | Install Mysql Client package"
+  apt:
+    name: mysql-server
+    state: present
+  when:
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+    - zabbix_proxy_install_database_client
+
+- name: Make sure mysql service is running
+  systemd:
+    name: mysqld
+    state: started
+    enabled: yes
+  when:
+    - zabbix_proxy_database == 'mysql'
 
 - name: Make sure zabbix-agent service is running
   systemd:
@@ -44,11 +75,6 @@
   template:
     src: zabbix_proxy.conf.j2
     dest: /etc/zabbix/zabbix_proxy.conf
-
-- name: restart zabbix-proxy
-  service:
-    name: zabbix-proxy
-    state: restarted
 
 - name: Copy zabbix_agent.conf template 
   template:

@@ -7,6 +7,37 @@
   selinux:
       state: disabled
 
+- name: Install packages dependencies
+  yum:
+    name:
+        - epel-release
+        - net-tools
+        - vim
+        - nano
+        - wget
+        - telnet
+        - rsync
+        - git
+        - python3
+        - python3-pip
+    state: present
+
+- name: "RedHat | Set facts for Zabbix <= 5.0"
+  set_fact:
+    datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}"
+  when:
+    - zabbix_version is version_compare('5.0', '<=')
+  tags:
+    - zabbix-proxy
+
+- name: "RedHat | Set facts for Zabbix >= 5.4"
+  set_fact:
+    datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_database }}"
+  when:
+    - zabbix_version is version_compare('5.4', '>=')
+  tags:
+    - zabbix-proxy
+
 - name: Install Zabbix Repo.
   yum_repository:
     name: "{{ item.name }}"
@@ -22,20 +53,43 @@
     name: "{{ packeges }}"
   vars:
     packeges:
-    - zabbix-proxy-sqlite3
+    - zabbix-proxy-{{ zabbix_proxy_database }}
     - zabbix-agent
+  when: zabbix_version <= 5.0
 
-- name: Create a directory if it does not exist
-  file:
-    path: /var/lib/sqlite/
-    state: directory
-    mode: '0755'
+- name: Install Zabbix packeges
+  yum:
+    name: "{{ packeges }}"
+  vars:
+    packeges:
+    - zabbix-sql-scripts
+    - zabbix-proxy-{{ zabbix_proxy_database }}
+    - zabbix-agent
+  when: zabbix_version >= 5.4
 
-- name: Import database Zabbix-proxy
-  shell: |
-   zcat /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz | sqlite3 /var/lib/sqlite/zabbix.db
-   chown -R zabbix:zabbix /var/lib/sqlite/
-  ignore_errors: true
+- name: "RedHat | Install Mysql"
+  yum:
+    name: mysql-server
+    state: present
+  when:
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+
+- name: Install pip packages
+  pip:
+    name:
+        - pymysql
+  when:
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+
+- name: Make sure mysql service is running
+  systemd:
+    name: mysqld
+    state: started
+    enabled: yes
+  when:
+    - ansible_distribution_major_version == '8'
 
 - name: Make sure zabbix-agent service is running
   systemd:
@@ -47,11 +101,6 @@
   template:
     src: zabbix_proxy.conf.j2
     dest: /etc/zabbix/zabbix_proxy.conf
-
-- name: restart zabbix-proxy
-  service:
-    name: zabbix-proxy
-    state: restarted
 
 - name: Copy zabbix_agent.conf template 
   template:
