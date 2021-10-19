@@ -36,6 +36,7 @@ mysql_users:
     password: "{{ zbx_database_password }}"
     priv: "{{ zabbix_proxy_dbname }}.*:ALL"
 ```
+Importante
 -----------------
 Se você usa mysql, deve definir o nome de usuário, senha e host mysql para preparar o banco de dados zabbix, caso contrário, eles serão considerados como seu valor default (e, portanto, conectar-se ao banco de dados será considerado como conectar-se ao host local sem senha). as chaves: login_host login_user login_password
 Existem 2 database_types que serão suportados: mysql e sqlite. Você precisará inserir as variáveis no playbook o banco de dados que deseja usar. Caso contrário seguirá o default que é SQlite3
