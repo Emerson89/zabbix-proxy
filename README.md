@@ -12,7 +12,7 @@ Versão Zabbix
 --------------
 A definir no arquivo de playbook.yml de acordo com a versão do zabbix-server padrão 4.4 
 
-## Inside variáveis DB RHEL 8/ Ubuntu20 zabbix/vars/main.yml:
+## Inside variáveis DB MYSQL RHEL 8/ Ubuntu20 zabbix/vars/main.yml:
 ```
 mysql_databases:
   - name: "{{ zabbix_proxy_dbname }}"
