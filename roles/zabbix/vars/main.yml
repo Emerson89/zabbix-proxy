@@ -1,8 +1,0 @@
-mysql_databases:
-  - name: "{{ zabbix_proxy_dbname }}"
-    encoding: utf8
-    collation: utf8_bin
-mysql_users:
-  - name: "{{ zbx_database_user }}"
-    password: "{{ zbx_database_password }}"
-    priv: "{{ zabbix_proxy_dbname }}.*:ALL"

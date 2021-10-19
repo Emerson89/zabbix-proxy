@@ -3,11 +3,11 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
 
-- name: "Debian | Set facts for Zabbix >= 3.0"
+- name: "Debian | Set facts for Zabbix <= 5.0"
   set_fact:
     datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}"
   when:
-    - zabbix_version is version_compare('3.0', '>=')
+    - zabbix_version is version_compare('5.0', '<=')
 
 - name: "Debian | Set facts for Zabbix >= 5.4"
   set_fact:
@@ -55,7 +55,6 @@
   when:
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
-    - zabbix_proxy_install_database_client
 
 - name: Make sure mysql service is running
   systemd:
@@ -63,6 +62,7 @@
     state: started
     enabled: yes
   when:
+    - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
 
 - name: Make sure zabbix-agent service is running

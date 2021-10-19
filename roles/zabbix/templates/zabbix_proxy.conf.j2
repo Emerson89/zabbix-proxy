@@ -170,7 +170,11 @@ DBHost=localhost
 # Default:
 # DBName=
 
+{% if path_db_sqlite == zabbix_proxy_database_long %}
+DBName=/var/lib/zabbix/zabbix_proxy.db
+{% else %}
 DBName={{ zabbix_proxy_dbname }}
+{% endif %}
 
 ### Option: DBSchema
 #	Schema name. Used for IBM DB2 and PostgreSQL.

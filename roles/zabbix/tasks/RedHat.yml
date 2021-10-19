@@ -24,12 +24,22 @@
 
 - name: "RedHat | Set facts for Zabbix <= 5.0"
   set_fact:
+    datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}*"
+  when:
+    - zabbix_version is version_compare('5.0', '<=')
+    - ansible_distribution_major_version == '7'
+  tags:
+    - zabbix-proxy
+  
+- name: "RedHat | Set facts for Zabbix <= 5.0"
+  set_fact:
     datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}"
   when:
     - zabbix_version is version_compare('5.0', '<=')
+    - ansible_distribution_major_version == '8'
   tags:
     - zabbix-proxy
-
+  
 - name: "RedHat | Set facts for Zabbix >= 5.4"
   set_fact:
     datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_database }}"
@@ -67,6 +77,113 @@
     - zabbix-agent
   when: zabbix_version >= 5.4
 
+- name: Install repo MySQL
+  yum:
+    name: "{{ mysql_repo }}"
+    state: latest
+  when:
+    - ansible_distribution_major_version == '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+
+- name: "RedHat | Install Mysql"
+  yum:
+    name: 
+        - mysql-server
+        - MySQL-python
+    state: present
+  when:
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+    - ansible_distribution_major_version == '7'
+
+- name: Start MySQL and enable on boot
+  service:
+    name: mysqld
+    state: started
+    enabled: yes
+  when:
+    - ansible_distribution_major_version == '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+
+- name: Find MySQL temporary password 
+  shell: "grep temporary.*root@localhost /var/log/mysqld.log | sed 's/.*root@localhost: //' | tail -n 1"
+  register: mysql_root_password_temp
+  when:
+    - ansible_distribution_major_version == '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+
+- name: Debug MySQL temporary password
+  debug: 
+    msg: "{{ mysql_root_password_temp.stdout }}"
+  when:
+    - ansible_distribution_major_version == '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql' 
+
+- name: Detect and properly set root password
+  stat:
+    path: /root/.my.cnf
+  register: r
+  when:
+    - ansible_distribution_major_version == '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+
+- mysql_user:
+    name: root
+    password: "{{ mysql_root_password }}"
+  when: 
+    - r.stat.exists==True
+    - ansible_distribution_major_version == '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+  ignore_errors: true
+
+- name: Set new password from temporary password
+  shell: 'mysql -e "SET PASSWORD = PASSWORD(''{{ mysql_root_password }}'');" --connect-expired-password -uroot -p"{{ mysql_root_password_temp.stdout }}"'
+  when: 
+    - r.stat.exists==False
+    - ansible_distribution_major_version == '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+  ignore_errors: true
+
+- name: Create `/root/.my.cnf`  with root password credentials
+  template:
+    src:  user.root.my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    mode: 0600
+    force: yes
+  when:
+    - ansible_distribution_major_version == '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'  
+
+- name: Install python packages
+  yum:
+    name:
+        - python
+        - python-pip
+    state: present
+  when:
+    - ansible_distribution_major_version == '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+
+- name: Install pip packages
+  pip:
+    name:
+        - pymysql
+    executable: pip3
+  when:
+    - ansible_distribution_major_version == '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+
 - name: "RedHat | Install Mysql"
   yum:
     name: mysql-server
@@ -74,6 +191,7 @@
   when:
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
+    - ansible_distribution_major_version == '8'
 
 - name: Install pip packages
   pip:
@@ -82,6 +200,7 @@
   when:
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
+    - ansible_distribution_major_version == '8'
 
 - name: Make sure mysql service is running
   systemd:
@@ -90,6 +209,8 @@
     enabled: yes
   when:
     - ansible_distribution_major_version == '8'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
 
 - name: Make sure zabbix-agent service is running
   systemd:

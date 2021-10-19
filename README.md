@@ -1,18 +1,18 @@
-Zabbix-proxy 
-=========
+# Zabbix-proxy 
+==============================
 
 Requerimentos
 ------------
 - ansible 2.9.6
 - Suporte as distribuições baseadas em Debian e RedHat
-- Testado no Ubuntu20 e Rocky8 
+- Testado no Ubuntu20, Rocky8 e Centos7 
 - Banco de dados Sqlite e Mysql
 
 Versão Zabbix
 --------------
-A definir no arquivo de playbook.yml de acordo com a versão do zabbix-server padrão 5.0 
+A definir no arquivo de playbook.yml de acordo com a versão do zabbix-server padrão 4.4 
 
-## Inside variáveis DB zabbix/vars/main.yml:
+## Inside variáveis DB RHEL 8/ Ubuntu20 zabbix/vars/main.yml:
 ```
 mysql_databases:
   - name: "{{ zabbix_proxy_dbname }}"
@@ -23,6 +23,20 @@ mysql_users:
     password: "{{ zbx_database_password }}"
     priv: "{{ zabbix_proxy_dbname }}.*:ALL"
 ```
+## Para Centos 7 utilize as variáveis
+```
+mysql_databases:
+  - name: "{{ zabbix_proxy_dbname }}"
+    login_password: "{{ mysql_root_password }}"
+    encoding: utf8
+    collation: utf8_bin
+mysql_users:
+  - login_password: "{{ mysql_root_password }}"
+    name: "{{ zbx_database_user }}"
+    password: "{{ zbx_database_password }}"
+    priv: "{{ zabbix_proxy_dbname }}.*:ALL"
+```
+Se você usa mysql, deve definir o nome de usuário, senha e host mysql para preparar o banco de dados zabbix, caso contrário, eles serão considerados como seu valor padrão (e, portanto, conectar-se ao banco de dados será considerado como conectar-se ao host local sem senha). as chaves: login_host login_user login_password
 ```
   zabbix_proxy_database: mysql 
   zabbix_proxy_database_long: mysql 
@@ -31,9 +45,7 @@ mysql_users:
 ```
 Existem 2 database_types que serão suportados: mysql e sqlite. Você precisará comentar ou descomentar o banco de dados que deseja usar. No exemplo acima, o banco de dados mysql é usado. Se você quiser usar o sqlite3, descomente as 2 linhas do sqlite3 e comente as 2 linhas do mysql.
 
-Se você usa mysql, deve definir o nome de usuário, senha e host mysql para preparar o banco de dados zabbix, caso contrário, eles serão considerados como seu valor padrão (e, portanto, conectar-se ao banco de dados será considerado como conectar-se ao host local sem senha). as chaves estão abaixo: zabbix_proxy_mysql_login_host zabbix_proxy_mysql_login_user zabbix_proxy_mysql_login_password
-
-Arquivo de inventário hosts
+Arquivo de inventário
 --------------
 ```
 [zabbix]
@@ -47,7 +59,7 @@ Playbook Exemplo
 - hosts: all
   vars:
     zabbix_server_ip: 'IP-ZABBIX-SERVER'
-    zabbix_version: 5.0
+    zabbix_version: 4.4
   roles:
     - zabbix
   become: yes
@@ -55,5 +67,4 @@ Playbook Exemplo
 ```
 Licença
 -------
-
-BSD
+GPLv3

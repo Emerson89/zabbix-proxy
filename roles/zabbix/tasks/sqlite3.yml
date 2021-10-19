@@ -13,17 +13,17 @@
     mode: '0755'
   when:
     - zabbix_database_creation
-    
+
+- name: "Get the file for schema.sql"
+  shell: ls -1 {{ datafiles_path }}/schema.sql.gz
+  changed_when: False
+  when:
+    - zabbix_database_sqlload
+  register: ls_output_create
+
 - name: Import database Zabbix-proxy
   shell: |
-   zcat /usr/share/doc/zabbix-proxy-sqlite3/schema.sql.gz | sqlite3 {{ zabbix_proxy_dbname }}
+   zcat {{ ls_output_create.stdout }} | sqlite3 {{ zabbix_proxy_dbname }}
    chown -R zabbix:zabbix /var/lib/zabbix/zabbix_proxy.db
-  #ignore_errors: true
   when:
     - zabbix_database_creation
-
-- name: Inserindo DBName
-  lineinfile:
-    path: /etc/zabbix/zabbix_proxy.conf
-    regexp: '^DBName=zabbix_proxy'
-    line: 'DBName=/var/lib/zabbix/zabbix_proxy.db'
