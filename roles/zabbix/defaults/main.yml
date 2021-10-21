@@ -2,11 +2,11 @@
 zabbix_hostname: "{{ ansible_hostname }}"
 zabbix_proxy_dbname: zabbix_proxy
 zbx_database_user: zabbix
-zbx_database_password: Zabbixdb2020
+zbx_database_password: Zabbixdb!2020
 zbx_database_address: localhost
 zbx_database_port: 3306
 zbx_user_privileges: localhost
-mysql_root_password: Zabbixdb2020
+mysql_root_password: Zabbixdb!2020
 
 # URL do repo.zabbix.com da versão do Zabbix Release Ubuntu
 zabbix_version: 4.4

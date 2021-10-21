@@ -48,3 +48,4 @@
     - zabbix_database_creation
   #no_log: true
   ignore_errors: true
+
