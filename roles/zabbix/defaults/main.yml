@@ -8,9 +8,7 @@ zbx_database_port: 3306
 zbx_user_privileges: localhost
 mysql_root_password: Zabbixdb!2020
 
-# URL do repo.zabbix.com da versão do Zabbix Release Ubuntu
 zabbix_version: 4.4
-repo_zabbix: deb https://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu {{ ansible_distribution_release }} main
 
 # URL do repo.zabbix.com da versão do Zabbix Release RedHat
 zabbix_repo: zabbix

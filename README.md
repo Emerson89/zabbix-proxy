@@ -4,8 +4,8 @@
 Requerimentos
 ------------
 - ansible 2.9.6
-- Suporte as distribuições baseadas em Debian e RedHat
-- Testado no Ubuntu20, Rocky8 e Centos7 
+- Suporte as distribuições baseadas em RedHat
+- Testado no Rocky8 e Centos7 
 - Banco de dados Sqlite e Mysql
 
 Versão Zabbix
