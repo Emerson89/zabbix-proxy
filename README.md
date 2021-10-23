@@ -20,7 +20,7 @@ mysql_databases:
     collation: utf8_bin
 mysql_users:
   - name: "{{ zbx_database_user }}"
-    password: "{{ mysql_zabbix_pass.stdout }}"
+    password: "{{ mysql_zabbix_pass.stdout}}"
     priv: "{{ zabbix_proxy_dbname }}.*:ALL"
 ```
 ## Para Centos 7 utilize as variáveis
