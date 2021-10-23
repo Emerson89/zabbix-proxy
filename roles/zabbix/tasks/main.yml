@@ -2,26 +2,29 @@
 - include_tasks: RedHat.yml
   when: ansible_distribution_file_variety == 'RedHat'
 
+- include_tasks: Debian.yml
+  when: ansible_distribution_file_variety == 'Debian'
+
 - name: "Installing the database"
   include: "{{ zabbix_proxy_database_long }}.yml"
 
-- name: Copy schema DB
-  shell: cp /usr/share/doc/zabbix-proxy-mysql-*/schema.sql.gz /tmp
-  when:
-    - ansible_distribution_major_version == '7'
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
+#- name: Copy schema DB
+#  shell: cp /usr/share/doc/zabbix-proxy-mysql-*/schema.sql.gz /tmp
+#  when:
+#    - ansible_distribution_major_version == '7'
+#    - zabbix_database_creation or zabbix_database_sqlload
+#    - zabbix_proxy_database == 'mysql'
 
-- name: Import database Zabbix Centos 7
-  mysql_db:
-   name: "{{ zabbix_proxy_dbname }}"
-   state: import
-   target: /tmp/schema.sql.gz
-  ignore_errors: true
-  when:
-    - ansible_distribution_major_version == '7'
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
+#- name: Import database Zabbix Centos 7
+#  mysql_db:
+#   name: "{{ zabbix_proxy_dbname }}"
+#   state: import
+#   target: /tmp/schema.sql.gz
+# ignore_errors: true
+#  when:
+#    - ansible_distribution_major_version == '7'
+#    - zabbix_database_creation or zabbix_database_sqlload
+#    - zabbix_proxy_database == 'mysql'
 
 - name: Restart zabbix-proxy
   service:
