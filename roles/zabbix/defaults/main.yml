@@ -7,6 +7,7 @@ zbx_database_port: 3306
 zbx_user_privileges: localhost
 mysql_zabbix_pass.stdout:
 zabbix_version: 4.4
+zabbix_server_ip: localhost
 
 # URL do repo.zabbix.com da versão do Zabbix Release RedHat
 zabbix_repo: zabbix
