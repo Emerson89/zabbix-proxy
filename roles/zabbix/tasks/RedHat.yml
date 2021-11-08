@@ -20,6 +20,7 @@
         - git
         - python3
         - python3-pip
+        - sqlite
     state: present
 
 - name: "RedHat | Set facts for Zabbix <= 5.0"

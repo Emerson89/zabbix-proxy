@@ -7,6 +7,7 @@ zbx_database_port: 3306
 zbx_user_privileges: localhost
 mysql_zabbix_pass.stdout:
 zabbix_version: 4.4
+zabbix_server_ip: 127.0.0.1
 
 # URL do repo.zabbix.com da versão do Zabbix Release RedHat
 zabbix_repo: zabbix
@@ -27,9 +28,8 @@ zabbix_repo_yum:
 zabbix_database_creation: True
 zabbix_database_sqlload: True
 path_db_sqlite: sqlite3
+db_mysql: mysql
 # Some role specific vars
-#zabbix_proxy_database: mysql
-#zabbix_proxy_database_long: mysql
 zabbix_proxy_database: sqlite3
 zabbix_proxy_database_long: sqlite3
 # Databases.
