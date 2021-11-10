@@ -241,3 +241,15 @@
     src: zabbix_agentd.conf.j2
     dest: /etc/zabbix/zabbix_agentd.conf
   notify: start zabbix agent
+
+- name: Inserindo scripts cloudwatch
+  template:
+    src: "{{ item }}"
+    dest: /usr/lib/zabbix/externalscripts
+  with_items:
+    - cloudwatch-sns.py.j2
+    - cloudwatch-zabbix.py.j2
+    - rds_disk_alocado.py.j2
+    - rds.discovery.py.j2
+    - sns-custo.py.j2
+    - state_rds.py.j2
