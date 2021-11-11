@@ -242,14 +242,9 @@
     dest: /etc/zabbix/zabbix_agentd.conf
   notify: start zabbix agent
 
-- name: Inserindo scripts cloudwatch
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-  with_items:
-    - { src: 'cloudwatch-sns.py.j2', dest: '/usr/lib/zabbix/externalscripts/cloudwatch-sns.py'}
-    - { src: 'cloudwatch-zabbix.py.j2', dest: '/usr/lib/zabbix/externalscripts/cloudwatch-zabbix.py'}
-    - { src: 'rds_disk_alocado.py.j2', dest: '/usr/lib/zabbix/externalscripts/rds_disk_alocado.py'}
-    - { src: 'rds.discovery.py.j2', dest: '/usr/lib/zabbix/externalscripts/rds.discovery.py'}
-    - { src: 'sns-custo.py.j2', dest: '/usr/lib/zabbix/externalscripts/sns-custo.py'}
-    - { src: 'state_rds.py.j2', dest: '/usr/lib/zabbix/externalscripts/state_rds.py'}
+
+
+
+
+
+
