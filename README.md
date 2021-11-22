@@ -1,6 +1,8 @@
 # Zabbix-proxy 
 ==============================
 
+[![Build Status](https://app.travis-ci.com/Emerson89/zabbix-proxy.svg?branch=dev)](https://travis-ci.com/Emerson89/zabbix-proxy)
+
 Requerimentos
 ------------
 - ansible 2.9.6
