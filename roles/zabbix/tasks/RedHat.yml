@@ -6,6 +6,7 @@
 - name: Disable SELinux
   selinux:
       state: disabled
+  ignore_errors: true
 
 - name: Install packages dependencies
   yum:
