@@ -3,11 +3,6 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
 
-- name: Disable SELinux
-  selinux:
-      state: disabled
-  ignore_errors: true
-
 - name: Install packages dependencies
   yum:
     name:
@@ -23,6 +18,11 @@
         - python3-pip
         - sqlite
     state: present
+    
+- name: Disable SELinux
+  selinux:
+      state: disabled
+  ignore_errors: true
 
 - name: "RedHat | Set facts for Zabbix <= 5.0"
   set_fact:
