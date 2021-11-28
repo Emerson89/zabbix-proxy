@@ -140,29 +140,29 @@
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
 
-- name: Mysql | Create a new pass for root user
-  command: openssl rand -base64 8
-  register: mysql_root_pass
-  when:
-    - ansible_distribution_major_version == '7'
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
-
-- name: Mysql | Display new pass in playbook  output
-  debug:
-      msg: "New root pass: {{mysql_root_pass.stdout}}"
-  when: 
-    - mysql_root_pass.changed
-    - ansible_distribution_major_version == '7'
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
-
 - name: Set new password from temporary password
-  shell: 'mysql -e "SET PASSWORD = PASSWORD(''{{ mysql_root_pass.stdout }}'');" --connect-expired-password -uroot -p"{{ mysql_root_password_temp.stdout }}"'
+  shell: 'mysql -e "SET PASSWORD = PASSWORD(''{{ mysql_root_pass }}'');" --connect-expired-password -uroot -p"{{ mysql_root_password_temp.stdout }}"'
   when: 
     - ansible_distribution_major_version == '7'
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
+  ignore_errors: true
+
+- name: Set Mysql root Password
+  mysql_user:
+    name: "{{ item.name }}"
+    host: "{{ item.host | default('localhost') }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv | default('priv: *.*:USAGE') }}"
+    state: "{{ item.state | default('present') }}"
+    append_privs: "{{ item.append_privs | default('no') }}"
+    encrypted: "{{ item.encrypted | default('no') }}"
+  with_items: "{{ mysql_root_users }}"
+  when: 
+    - ansible_distribution_major_version != '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+  no_log: true
   ignore_errors: true
 
 - name: Create `/root/.my.cnf`  with root password credentials
@@ -173,7 +173,6 @@
     mode: 0600
     force: yes
   when:
-    - ansible_distribution_major_version == '7'
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'  
 

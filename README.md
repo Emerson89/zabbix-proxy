@@ -29,11 +29,11 @@ mysql_users:
 ```
 mysql_databases:
   - name: "{{ zabbix_proxy_dbname }}"
-    login_password: "{{ mysql_root_pass.stdout }}"
+    login_password: "{{ mysql_root_pass }}"
     encoding: utf8
     collation: utf8_bin
 mysql_users:
-  - login_password: "{{ mysql_root_pass.stdout }}"
+  - login_password: "{{ mysql_root_pass }}"
     name: "{{ zbx_database_user }}"
     password: "{{ mysql_zabbix_pass.stdout }}"
     priv: "{{ zabbix_proxy_dbname }}.*:ALL"
@@ -42,11 +42,11 @@ mysql_users:
 ```
 mysql_databases:
   - name: "{{ zabbix_proxy_dbname }}"
-    login_password: "{{ mysql_root_pass.stdout }}"
+    login_password: "{{ mysql_root_pass }}"
     encoding: utf8
     collation: utf8_bin
 mysql_users:
-  - login_password: "{{ mysql_root_pass.stdout }}"
+  - login_password: "{{ mysql_root_pass }}"
     name: "{{ zbx_database_user }}"
     password: "{{ mysql_zabbix_pass.stdout }}"
     priv: "{{ zabbix_proxy_dbname }}.*:ALL"
