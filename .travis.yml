@@ -10,7 +10,7 @@ env:
   - >
     container_id=$(mktemp)
     distribution=ubuntu
-    version=18
+    version=18.04
     init=/sbin/init
     run_opts=""    
 
