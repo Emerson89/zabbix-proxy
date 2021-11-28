@@ -1,5 +1,5 @@
 # Dockerfile.ubuntu
-FROM debian:buster
+FROM ubuntu:18
 # Install Ansible
 RUN apt-get install -y software-properties-common git
 RUN apt-add-repository -y ppa:ansible/ansible

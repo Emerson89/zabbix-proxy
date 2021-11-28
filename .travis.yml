@@ -9,8 +9,8 @@ env:
     run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"    
   - >
     container_id=$(mktemp)
-    distribution=debian
-    version=buster
+    distribution=ubuntu
+    version=18
     init=/sbin/init
     run_opts=""    
 
