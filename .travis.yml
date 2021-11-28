@@ -10,8 +10,8 @@ env:
   - >
     container_id=$(mktemp)
     distribution=ubuntu
-    version=20.04
-    init=/lib/systemd/system
+    version=14.04
+    init=/sbin/init
     run_opts=""    
 
 services:
