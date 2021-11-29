@@ -32,8 +32,8 @@ zabbix_database_sqlload: True
 path_db_sqlite: sqlite3
 db_mysql: mysql
 # Some role specific vars
-zabbix_proxy_database: mysql
-zabbix_proxy_database_long: mysql
+zabbix_proxy_database: sqlite3
+zabbix_proxy_database_long: sqlite3
 # Databases.
 mysql_databases: []
 #   - name: example
