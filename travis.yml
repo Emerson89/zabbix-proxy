@@ -8,11 +8,11 @@ env:
     init=/usr/lib/systemd/systemd
     run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"    
   - >
-    container_id=$(mktemp)
-    distribution=ubuntu
-    version=18.04
-    init=/sbin/init
-    run_opts=""    
+    #container_id=$(mktemp)
+    #distribution=ubuntu
+    #version=18.04
+    #init=/sbin/init
+    #run_opts=""    
 
 services:
   - docker
