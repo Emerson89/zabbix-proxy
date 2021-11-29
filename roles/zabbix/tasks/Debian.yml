@@ -54,7 +54,7 @@
     packeges:
     - zabbix-proxy-{{ zabbix_proxy_database }}
     - zabbix-agent
-  when: zabbix_version <= 5.0
+  when: zabbix_version is version_compare('5.0', '<=')
 
 - name: Install Zabbix packeges
   apt:
@@ -64,14 +64,13 @@
     - zabbix-sql-scripts
     - zabbix-proxy-{{ zabbix_proxy_database }}
     - zabbix-agent
-  when: zabbix_version >= 5.4
+  when: zabbix_version is version_compare('5.4', '>=')
 
 - name: Install packages dependencies
   apt:
     name:
         - net-tools
         - vim
-        - nano
         - wget
         - telnet
         - rsync
@@ -101,21 +100,6 @@
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
 
-- name: MariaDB | Create a new pass for root user
-  command: openssl rand -base64 8
-  register: mysql_root_pass
-  when:
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
-
-- name: MariaDB | Display new pass in playbook  output
-  debug:
-      msg: "New root pass: {{mysql_root_pass.stdout}}"
-  when: 
-    - mysql_root_pass.changed
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
-
 - name: MariaDB | Remove anonymous access
   mysql_user: 
      name: "" 
@@ -132,7 +116,7 @@
   mysql_user: 
      name: root 
      host: "{{ item }}" 
-     password: "{{ mysql_root_pass.stdout }}" 
+     password: "{{ mysql_root_pass }}" 
      login_unix_socket: /var/run/mysqld/mysqld.sock 
   with_items:
       - 127.0.0.1

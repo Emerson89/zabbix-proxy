@@ -6,7 +6,7 @@ zbx_database_address: localhost
 zbx_database_port: 3306
 zbx_user_privileges: localhost
 mysql_zabbix_pass.stdout:
-mysql_root_pass: Root@1234
+mysql_root_pass: NZaFv3xGTpCK
 zabbix_version: 4.4
 zabbix_server_ip: 127.0.0.1
 mysql_root_username: root

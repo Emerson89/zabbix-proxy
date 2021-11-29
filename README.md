@@ -14,18 +14,7 @@ Versão Zabbix
 --------------
 A definir no arquivo de playbook.yml de acordo com a versão do zabbix-server padrão 4.4 
 
-## Inside variáveis DB MYSQL RHEL 8 zabbix/vars/main.yml:
-```
-mysql_databases:
-  - name: "{{ zabbix_proxy_dbname }}"
-    encoding: utf8
-    collation: utf8_bin
-mysql_users:
-  - name: "{{ zbx_database_user }}"
-    password: "{{ mysql_zabbix_pass.stdout }}"
-    priv: "{{ zabbix_proxy_dbname }}.*:ALL"
-```
-## Para Centos 7 utilize as variáveis
+## Inside variáveis DB MYSQL RHEL 7/8 zabbix/vars/main.yml (DEFAULT):
 ```
 mysql_databases:
   - name: "{{ zabbix_proxy_dbname }}"
