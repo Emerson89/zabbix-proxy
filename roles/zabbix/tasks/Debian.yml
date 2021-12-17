@@ -54,7 +54,11 @@
     packeges:
     - zabbix-proxy-{{ zabbix_proxy_database }}
     - zabbix-agent
+<<<<<<< HEAD
   when: zabbix_version is version_compare('5.2', '<=')
+=======
+  when: zabbix_version is version_compare('5.0', '<=')
+>>>>>>> 5ee822eb5ae3baea03ed917f485633343158d97a
 
 - name: Install Zabbix packeges
   apt:
@@ -71,7 +75,6 @@
     name:
         - net-tools
         - vim
-        - nano
         - wget
         - telnet
         - rsync
@@ -101,6 +104,21 @@
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
 
+<<<<<<< HEAD
+=======
+- name: MariaDB | Remove anonymous access
+  mysql_user: 
+     name: "" 
+     host: "{{ item }}" 
+     state: absent
+     login_unix_socket: /var/run/mysqld/mysqld.sock 
+  with_items:
+      - localhost
+  when:
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+
+>>>>>>> 5ee822eb5ae3baea03ed917f485633343158d97a
 - name: MariaDB | Change root pass
   mysql_user: 
      name: root 

@@ -9,7 +9,15 @@
         - epel-release
         - net-tools
         - vim
+<<<<<<< HEAD
         - telnet
+=======
+        - wget
+        - telnet
+        - rsync
+        - git
+        - openssl
+>>>>>>> 5ee822eb5ae3baea03ed917f485633343158d97a
         - python3
         - python3-pip
         - sqlite
@@ -63,7 +71,11 @@
     packeges:
     - zabbix-proxy-{{ zabbix_proxy_database }}
     - zabbix-agent
+<<<<<<< HEAD
   when: zabbix_version is version_compare('5.2', '<=')
+=======
+  when: zabbix_version is version_compare('5.0', '<=')
+>>>>>>> 5ee822eb5ae3baea03ed917f485633343158d97a
 
 - name: Install Zabbix packeges
   yum:
@@ -142,6 +154,7 @@
     - ansible_distribution_major_version == '7'
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
+<<<<<<< HEAD
   ignore_errors: true
 
 - name: Install pip packages
@@ -152,6 +165,9 @@
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
     - ansible_distribution_major_version == '8' 
+=======
+  ignore_errors: true  
+>>>>>>> 5ee822eb5ae3baea03ed917f485633343158d97a
 
 - name: Install python packages
   yum:
@@ -181,15 +197,55 @@
   when:
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
-    - ansible_distribution_major_version == '8'
+    - ansible_distribution_major_version != '7'
 
+<<<<<<< HEAD
+=======
+- name: Install pip packages
+  pip:
+    name:
+        - pymysql
+  when:
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+    - ansible_distribution_major_version != '7'
+
+>>>>>>> 5ee822eb5ae3baea03ed917f485633343158d97a
 - name: Make sure mysql service is running
   systemd:
     name: mysqld
     state: started
     enabled: yes
   when:
-    - ansible_distribution_major_version == '8'
+    - ansible_distribution_major_version != '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+
+- name: Set Mysql root Password
+  mysql_user:
+    name: "{{ item.name }}"
+    host: "{{ item.host | default('localhost') }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv | default('priv: *.*:USAGE') }}"
+    state: "{{ item.state | default('present') }}"
+    append_privs: "{{ item.append_privs | default('no') }}"
+    encrypted: "{{ item.encrypted | default('no') }}"
+  with_items: "{{ mysql_root_users }}"
+  when: 
+    - ansible_distribution_major_version != '7'
+    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database == 'mysql'
+  no_log: true
+  ignore_errors: true
+
+- name: Create `/root/.my.cnf`  with root password credentials
+  template:
+    src:  user.root.my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    mode: 0600
+    force: yes
+  when:
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
 
