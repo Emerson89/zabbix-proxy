@@ -9,15 +9,7 @@
         - epel-release
         - net-tools
         - vim
-<<<<<<< HEAD
         - telnet
-=======
-        - wget
-        - telnet
-        - rsync
-        - git
-        - openssl
->>>>>>> 5ee822eb5ae3baea03ed917f485633343158d97a
         - python3
         - python3-pip
         - sqlite
@@ -71,11 +63,7 @@
     packeges:
     - zabbix-proxy-{{ zabbix_proxy_database }}
     - zabbix-agent
-<<<<<<< HEAD
   when: zabbix_version is version_compare('5.2', '<=')
-=======
-  when: zabbix_version is version_compare('5.0', '<=')
->>>>>>> 5ee822eb5ae3baea03ed917f485633343158d97a
 
 - name: Install Zabbix packeges
   yum:
@@ -154,7 +142,6 @@
     - ansible_distribution_major_version == '7'
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
-<<<<<<< HEAD
   ignore_errors: true
 
 - name: Install pip packages
@@ -165,9 +152,6 @@
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
     - ansible_distribution_major_version == '8' 
-=======
-  ignore_errors: true  
->>>>>>> 5ee822eb5ae3baea03ed917f485633343158d97a
 
 - name: Install python packages
   yum:
@@ -199,18 +183,6 @@
     - zabbix_proxy_database == 'mysql'
     - ansible_distribution_major_version != '7'
 
-<<<<<<< HEAD
-=======
-- name: Install pip packages
-  pip:
-    name:
-        - pymysql
-  when:
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
-    - ansible_distribution_major_version != '7'
-
->>>>>>> 5ee822eb5ae3baea03ed917f485633343158d97a
 - name: Make sure mysql service is running
   systemd:
     name: mysqld
