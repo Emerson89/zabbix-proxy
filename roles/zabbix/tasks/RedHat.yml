@@ -3,6 +3,11 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
 
+- name: Checking updates
+  yum:
+    update_only: yes
+    state: latest
+
 - name: Install packages dependencies
   yum:
     name:

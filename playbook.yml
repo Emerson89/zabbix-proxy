@@ -4,5 +4,5 @@
      zabbix_proxy_database_long: sqlite3
   roles:
     - zabbix
-  become: yes
+  become: true
   
