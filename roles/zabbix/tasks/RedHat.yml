@@ -3,9 +3,9 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
 
-- name: Checking updates
+- name: Upgrade all packages
   yum:
-    update_only: yes
+    name: '*'
     state: latest
 
 - name: Install packages dependencies
@@ -125,21 +125,6 @@
     - ansible_distribution_major_version == '7'
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql' 
-
-- name: Mysql | Create a new pass for zabbix user
-  command: openssl rand -base64 8
-  register: mysql_zabbix_pass
-  when:
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
-
-- name: Mysql | Display new pass in playbook output
-  debug:
-      msg: "New zabbix pass: {{mysql_zabbix_pass.stdout}}"
-  when: 
-    - mysql_zabbix_pass.changed
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
 
 - name: Set new password from temporary password
   shell: 'mysql -e "SET PASSWORD = PASSWORD(''{{ mysql_root_pass }}'');" --connect-expired-password -uroot -p"{{ mysql_root_password_temp.stdout }}"'

@@ -20,6 +20,30 @@
     update_cache: yes
     upgrade: yes
 
+- name: Add an Apt signing key mysql
+  apt_key:
+    url: https://mariadb.org/mariadb_release_signing_key.asc
+    state: present
+
+- name: Install repo mysql
+  apt_repository:
+    repo: "deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/10.5/ubuntu {{ ansible_distribution_release }} main"
+    state: present
+    update_cache: yes
+  when: 
+   - ansible_distribution == "Ubuntu"
+
+- name: Install mariadb-server
+  apt:
+    name: 
+        - mariadb-server
+
+- name: Make sure mariadb service is running
+  systemd:
+    name: mariadb
+    state: started
+    enabled: yes  
+
 - name: Add an Apt signing key zabbix
   apt_key:
     url: http://repo.zabbix.com/zabbix-official-repo.key
@@ -69,12 +93,6 @@
 - name: Install packages dependencies
   apt:
     name:
-        - net-tools
-        - vim
-        - wget
-        - telnet
-        - rsync
-        - git
         - python3
         - python3-pip
     state: present
@@ -85,20 +103,20 @@
         - pymysql
     executable: pip3
 
-- name: MariaDB | Create a new pass for zabbix user
-  command: openssl rand -base64 8
-  register: mysql_zabbix_pass
-  when:
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
-
-- name: MariaDB | Display new pass in playbook output
-  debug:
-      msg: "New zabbix pass: {{mysql_zabbix_pass.stdout}}"
-  when: 
-    - mysql_zabbix_pass.changed
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
+#- name: MariaDB | Create a new pass for zabbix user
+#  command: openssl rand -base64 8
+#  register: mysql_zabbix_pass
+#  when:
+#    - zabbix_database_creation or zabbix_database_sqlload
+#    - zabbix_proxy_database == 'mysql'
+#
+#- name: MariaDB | Display new pass in playbook output
+#  debug:
+#      msg: "New zabbix pass: {{mysql_zabbix_pass.stdout}}"
+#  when: 
+#    - mysql_zabbix_pass.changed
+#    - zabbix_database_creation or zabbix_database_sqlload
+#    - zabbix_proxy_database == 'mysql'
 
 - name: MariaDB | Change root pass
   mysql_user: 
