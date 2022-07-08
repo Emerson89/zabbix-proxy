@@ -19,7 +19,16 @@
   changed_when: False
   when:
     - zabbix_database_sqlload
+    - zabbix_version is version_compare('5.4', '<=')
   register: ls_output_create
+
+- name: "Get the file for schema.sql V6"
+  shell: ls -1 {{ datafiles_path }}/proxy.sql
+  changed_when: False
+  when:
+    - zabbix_database_sqlload
+    - zabbix_version is version_compare('6.0', '>=')
+  register: ls_output_create_v6
 
 - name: Import database Zabbix-proxy
   shell: |
@@ -27,3 +36,12 @@
    chown -R zabbix:zabbix /var/lib/zabbix/zabbix_proxy.db
   when:
     - zabbix_database_creation
+    - zabbix_version is version_compare('5.4', '<=')
+
+- name: Import database Zabbix-proxy v6
+  shell: |
+   cat {{ ls_output_create_v6.stdout }} | sqlite3 {{ zabbix_proxy_dbname }}
+   chown -R zabbix:zabbix /var/lib/zabbix/zabbix_proxy.db
+  when:
+    - zabbix_database_creation
+    - zabbix_version is version_compare('6.0', '>=')
