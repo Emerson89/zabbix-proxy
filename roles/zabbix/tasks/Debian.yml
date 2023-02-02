@@ -24,6 +24,8 @@
   apt_key:
     url: https://mariadb.org/mariadb_release_signing_key.asc
     state: present
+  when:
+    - zabbix_database_creation == "mysql" and zabbix_database_sqlload == "mysql"
 
 - name: Install repo mysql
   apt_repository:
@@ -31,18 +33,23 @@
     state: present
     update_cache: yes
   when: 
+   - zabbix_database_creation == "mysql" and zabbix_database_sqlload == "mysql"
    - ansible_distribution == "Ubuntu"
 
 - name: Install mariadb-server
   apt:
     name: 
         - mariadb-server
+  when:
+    - zabbix_database_creation == "mysql" and zabbix_database_sqlload == "mysql"      
 
 - name: Make sure mariadb service is running
   systemd:
     name: mariadb
     state: started
-    enabled: yes  
+    enabled: yes
+  when:
+    - zabbix_database_creation == "mysql" and zabbix_database_sqlload == "mysql"    
 
 - name: Add an Apt signing key zabbix
   apt_key:
