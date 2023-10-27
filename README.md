@@ -4,7 +4,7 @@
 Requerimentos
 ------------
 - ansible 2.9.6
-- Testado no Ubuntu20, Rocky8 e Centos7 
+- Testado no Ubuntu20, Rocky8, Almalinux8 e Centos7 
 - Banco de dados Sqlite e Mysql
 
 Versão Zabbix
